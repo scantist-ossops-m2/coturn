@@ -11,20 +11,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
+        os: [ 'ubuntu:16.04', 'ubuntu:20.04', 'ubuntu:22.04' ]
+    runs-on: ubuntu-latest
+    container: ${{ matrix.os }}
     steps:
+    - uses: actions/checkout@v3
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
+        apt-get update
+        apt-get install -y \
+            build-essential pkgconf \
             libevent-dev \
             libssl-dev \
-            libpq-dev libmariadb-dev libsqlite3-dev \
+            libpq-dev libsqlite3-dev \
             libhiredis-dev \
             libmongoc-dev \
             libmicrohttpd-dev
-    - uses: actions/checkout@v3
+      # Different versions of ubuntu have different libmariadb packages
+        apt-get install -y libmariadb-dev libmariadb-client-lgpl-dev || true
     - name: configure
       run: ./configure
     - name: make
